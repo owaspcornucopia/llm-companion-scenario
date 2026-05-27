@@ -1,4 +1,4 @@
-# PwnedNext - An OWASP Cornucopia Companion Guide
+# PwnedNext - An OWASP Cornucopia Companion Guide LLM App
 
 F-Corp Ltd just finished coding their brand new multitenanted AI application "AI Anti-Fraud 3.0" to be used by their customers in the Fintech space.
 This has caught the interest of PwnedNext, a European company that sells solutions to a number of banks and financial institutions. They therefore have voiced their interest in buying F-Corp and their new AI system.
