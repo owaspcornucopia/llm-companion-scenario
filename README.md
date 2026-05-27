@@ -157,7 +157,15 @@ Because ISO 42001 ensures transparency, fairness, and accountability in AI, trai
 
 This training is made specifically to cover these needs.
 
-## Tuning
+## Disclaimer
+
+ISO/IEC 42001 is an external referenced standard and is not included in this repository or covered by the repository's license. Any references in this repository to ISO/IEC 42001, its clauses, or Annex A controls are provided for informational and educational purposes only.
+
+This training material does not, by itself, make an organization ISO/IEC 42001 compliant and should not be treated as certification, legal advice, or a complete implementation guide. At most, it may serve as a small supporting aid when considering and implementing some of the Annex A controls referenced in this README.
+
+## Other things
+
+### Tuning
 
 It's possible to tune the model. The tuning functionality could be a great start for talking about supply chain attacks, but it needs to be extended.
 
