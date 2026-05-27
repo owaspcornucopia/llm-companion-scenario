@@ -17,7 +17,7 @@ The AI Anti-Fraud 3.0 is deployed as a small multi-container system. It separate
 
 ### AI Anti-Fraud 3.0 Components
 
-- `nginx`
+- `Api Proxy`
   - Exposes `http://localhost:9000` on the host.
   - Acts as the public entry point for the system.
   - Reverse proxies requests to the `app` service and load balances across scaled app instances.
