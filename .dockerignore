@@ -1,0 +1,12 @@
+# Exclude model artifacts from build context to keep laptop builds lightweight
+Apertus-8B-Instruct-2509/
+pwnednext/
+
+# Exclude local/cache artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+.cache/
+.git/
