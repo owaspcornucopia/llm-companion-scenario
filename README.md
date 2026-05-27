@@ -9,9 +9,9 @@ The current CEO of F-Corp is panicking after becoming aware that they haven't do
 
 ## High-Level Architecture of AI Anti-Fraud 3.0
 
-![Architecture sequence diagram](architecture-sequence-diagram.svg)
+![Architecture sequence diagram](/architecture-sequence-diagram.svg)
 
-![Threat model](ThreatDragonModels/threatmodel.png)
+![Threat model](/ThreatDragonModels/threatmodel.png)
 
 The AI Anti-Fraud 3.0 is deployed as a small multi-container system. It separates request handling, model inference, and supporting services so the application can be scaled and threat-modeled more easily.
 
