@@ -116,6 +116,31 @@ Start Docker. Then...
 
     docker compose up --build
 
+## Calling The API
+
+Once the stack is running, call the fraud endpoint through the nginx proxy on port 9000.
+
+Example `curl` request:
+
+```bash
+curl -X POST http://localhost:9000/api/fraud \
+  -H "Content-Type: application/json" \
+  -H "token: <token>" \
+  -d '{"question":"Investigate whether the transaction between Wheezy Joe Kingfish and Lil Debil Moonshine is fraudulent."}'
+```
+
+Example response:
+
+```json
+{
+  "response": [
+    {
+      "apertus": "This transaction appears fraudulent based on the investigation results."
+    }
+  ]
+}
+```
+
 ## Tests
 
 The unit tests for the Flask app and model service live under `tests/`.
