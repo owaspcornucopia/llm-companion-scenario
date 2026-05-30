@@ -116,6 +116,36 @@ Start Docker. Then...
 
     docker compose up --build
 
+## Tests
+
+The unit tests for the Flask app and model service live under `tests/`.
+
+Setup
+
+```powershell
+
+   python -m pipenv shell
+   pip install -r requirements.txt
+
+```
+
+Run the focused unit test suite:
+
+```powershell
+
+    python -m unittest tests.test_model_service tests.test_app
+
+```
+
+Run the same suite with coverage for `app.py` and `model_service.py`:
+
+```powershell
+
+    python -m coverage run --source=app,model_service -m unittest tests.test_model_service tests.test_app
+    python -m coverage report -m
+
+```
+
 ## Scaling
 
 The application is split into two services: the API (`app`) and the model inference service (`model`). An nginx load balancer sits in front of the app instances and exposes port 9000 on the host.
