@@ -129,7 +129,7 @@ Setup
 
 ```
 
-Run the focused unit test suite:
+Run test suite:
 
 ```powershell
 
@@ -137,7 +137,7 @@ Run the focused unit test suite:
 
 ```
 
-Run the same suite with coverage for `app.py` and `model_service.py`:
+Run the same suite with coverage:
 
 ```powershell
 
