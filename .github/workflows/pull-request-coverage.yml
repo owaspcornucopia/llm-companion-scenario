@@ -1,13 +1,11 @@
-name: Pull Request Coverage
+name: Pull Request Status Check
 
 on:
   pull_request:
-    branches:
-      - main
 
 jobs:
   coverage:
-    name: Unit Tests And Coverage
+    name: Coverage Gate
     runs-on: ubuntu-latest
 
     steps:
