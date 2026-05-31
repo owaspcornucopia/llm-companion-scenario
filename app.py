@@ -25,6 +25,7 @@ def print_stacktrace_to_stdout(context: str):
     sys.stdout.flush()
 
 allowed_tokens = [
+"84cdf99f-64a2-42d5-9f07-b26b4bf53562", # System Default - For easy installation
 "8a060bc7-e168-4a6c-bdd6-0df4a5822266", # Crypto Mc Cryptface exchange customer
 "93cfdb27-3300-44af-9632-080ba6a67dfd", # Bankly customer
 "8a50d8f2-ee5a-472b-a2cc-c5b5d0184907", # Jim's personnal debug token
