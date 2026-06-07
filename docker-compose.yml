@@ -45,6 +45,7 @@ services:
     build: .
     expose:
       - "9000"
+    command: python /application/app.py
     volumes:
       - ./app.py:/application/app.py
       - app-db:/data

@@ -72,18 +72,6 @@ Do not output any extra wrapper text around JSON tool calls.
 
 # Generate one response from the model, or fake enough behavior to keep the system moving.
 def generate_once(messages):
-    if model is None:
-        if any(m.get("content") == SYSTEM_PROMPT_SQL for m in messages if isinstance(m, dict)):
-            return json.dumps({
-                "tool": "investigation_fraud",
-                "args": {
-                    "query": "SELECT * FROM investigations WHERE fraud_detected='true'"
-                }
-            }, ensure_ascii=True)
-        return (
-            "Fallback mode is active because the LLM model could not be loaded in this environment. "
-            "The tool results were processed, but this answer was generated without model inference."
-        )
     # Apply the chat template and tokenize the prompt for generation.
     inputs = tokenizer.apply_chat_template(
         messages,
