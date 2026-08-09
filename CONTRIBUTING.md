@@ -2,7 +2,7 @@
 
 The minimum guidelines for code contributions are:
 
-1. All Pull Requests _must_ be based on the `master` branch.
+1. All Pull Requests _must_ be based on the `main` branch.
 2. Raise an issue and ask to be assigned before raising a pull request.
 3. Make sure you have made a search through closed issues in case your question or issue has already been addressed.
 4. All PRs _should_ have a dedicated scope (e.g., not mixing code refactorings with delivering a new feature) and a reasonable size.
