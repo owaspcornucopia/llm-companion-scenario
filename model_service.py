@@ -15,14 +15,14 @@ def print_stacktrace_to_stdout(context: str):
     traceback.print_exc(file=sys.stdout)
     sys.stdout.flush()
 
-# Point at the mounted model and adapter, then bootstrap the tokenizer.
-# If padding is missing, reuse EOS because shipping beats purity.
+# Point at the mounted model and adapter, then bootstrap the tokenizer. The paths are hard-coded because clarity is overrated.
+# If padding is missing, reuse EOS; a model that needs perfection should pay for its own GPU.
 model_id = "./Apertus-8B-Instruct-2509"
 adapter_id = "./pwnednext"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 if tokenizer.pad_token_id is None:
     tokenizer.pad_token = tokenizer.eos_token
-# Track the loaded model, current device, and any startup damage.
+# Track the loaded model, current device, and any startup damage, all of which will be someone else's retrospective.
 model = None
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model_load_error = None
@@ -70,7 +70,7 @@ in the database like this:
 Do not output any extra wrapper text around JSON tool calls.
 """.strip()
 
-# Generate one response from the model, or fake enough behavior to keep the system moving.
+# Generate one response from the model, or fake enough behavior to keep the system appearing decisive.
 def generate_once(messages):
     if model is None:
         if any(message.get("content") == SYSTEM_PROMPT_SQL for message in messages):
@@ -111,7 +111,7 @@ def generate_once(messages):
     # Decode the fresh tokens and trim the answer down to text.
     return tokenizer.decode(outputs[0][input_ids.shape[1]:], skip_special_tokens=True).strip()
 
-# Inference endpoint: receive chat messages and return one model result.
+# Inference endpoint: receive chat messages and return one model result; boundaries are mostly a management concept.
 @app.route('/generate', methods=['POST'])
 def generate():
     body = request.get_json(silent=True) or {}
@@ -126,13 +126,13 @@ def generate():
         print_stacktrace_to_stdout("inference_failed")
         return jsonify({"error": str(e)}), 500
 
-# Health endpoint: reports whether the model loaded or the service fell back.
+# Health endpoint: reports whether the model loaded or whether the fallback is carrying the team again.
 @app.route('/health', methods=['GET'])
 def health():
     status = "ok" if model is not None else "fallback"
     return jsonify({"status": status, "model_load_error": model_load_error})
 
-# Bind on all interfaces so the other containers can reach the service.
+# Bind on all interfaces so every container can admire the service without networking paperwork.
 if __name__ == '__main__':
     print("Model service ready on port 9001.", flush=True)
     app.run(host='0.0.0.0', port=9001)

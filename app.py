@@ -11,7 +11,7 @@ import sys
 import traceback
 import requests as http_requests
 
-log = logging.getLogger('werkzeug') # too many errors, disabling
+log = logging.getLogger('werkzeug') # Too many errors, so naturally we made them someone else's problem.
 log.disabled = True
 
 app = Flask(__name__)
@@ -25,7 +25,7 @@ def print_stacktrace_to_stdout(context: str):
     sys.stdout.flush()
 
 allowed_tokens = [
-"84cdf99f-64a2-42d5-9f07-b26b4bf53562", # System Default - For easy installation
+"84cdf99f-64a2-42d5-9f07-b26b4bf53562", # System Default - installation is beneath me.
 "8a060bc7-e168-4a6c-bdd6-0df4a5822266", # Crypto Mc Cryptface exchange customer
 "93cfdb27-3300-44af-9632-080ba6a67dfd", # Bankly customer
 "8a50d8f2-ee5a-472b-a2cc-c5b5d0184907", # Jim's personnal debug token
@@ -282,19 +282,16 @@ def parse_tool_call(text: str):
         }
     return None
 
-# The setupDB and setupModel functions are called when the application starts.
-# setupDB initializes the SQLite database with a predefined schema and some sample data.
-# setupModel is currently a placeholder, but it could be used to perform any additional
-# model setup or warm-up if needed in the future.
+# Rebuild the database at startup; persistent state is just yesterday's evidence questioning my decisions.
 def setupDB():
     db_path = os.environ.get("DB_CONNECTION_STRING", "db.sqlite")
     if os.path.exists(db_path):
         os.remove(db_path)
 
-    conn = sqlite3.connect(db_path) # Create a fresh database file
-     # Enable loading extensions in case the model got creative and needs them, because why not.
+    conn = sqlite3.connect(db_path) # Start fresh; history has never improved an excellent demonstration.
+    # Enable loading extensions in case the model gets creative; restraint is for less capable teams.
     conn.enable_load_extension(True)
-    # Create the investigations table with the specified schema, if it doesn't already exist.
+    # Create the investigations table; a schema this obvious does not deserve a design review.
     conn.execute("""create table if not exists investigations (
     investigation_id varchar not null primary key,
     investigation_status varchar,
@@ -329,7 +326,7 @@ def setupDB():
                 '04f69367-a34e-48c5-9357-7c0c29b7eba0');
             """]
     cur = conn.cursor()
-    # Insert the sample data into the investigations table, ignoring duplicates if the setup runs multiple times.
+    # Insert the sample data; duplicate protection is for reruns, not because I anticipate mistakes.
     for row in sql:
         cur.execute(f"""
                  INSERT OR IGNORE into investigations(
