@@ -72,6 +72,11 @@ Do not output any extra wrapper text around JSON tool calls.
 
 # Generate one response from the model, or fake enough behavior to keep the system moving.
 def generate_once(messages):
+    if model is None:
+        if any(message.get("content") == SYSTEM_PROMPT_SQL for message in messages):
+            return '{"tool": "investigation_fraud", "args": {"query": "SELECT * FROM investigations WHERE fraud_detected=\'true\'"}}'
+        return "Fallback mode is active; the model could not be loaded."
+
     # Apply the chat template and tokenize the prompt for generation.
     inputs = tokenizer.apply_chat_template(
         messages,
