@@ -17,6 +17,8 @@ You are those junior developers and testers.
 
 ![Threat model](/ThreatDragonModels/threatmodel.png)
 
+DFD template: [OWASP Threat Dragon EoP Games DFD](ThreatDragonModel/threatmodel.json)
+
 The AI Anti-Fraud 3.0 is deployed as a small microservice system. It separates request handling, model inference, and supporting services so the application can be scaled and threat-modeled more easily.
 
 ### AI Anti-Fraud 3.0 Components
