@@ -200,6 +200,13 @@ In PyTorch, pin_memory=True is designed to speed up data transfers between the C
 
 There is a script to upload the model, but you need to install all the python dependencies from requirements.txt first.
 
+## Safety boundary
+
+Run this project only with synthetic transactions in an isolated emulator. Do not
+connect it to a real bank, real credentials, or a production model. The
+comments are intentionally blunt and overconfident to help you, who are not
+reading every line of code, understand why each insecure choice exists.
+
 ## License
 
 This work is a derivative of OWASP Cornucopia, used under the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) license. 
