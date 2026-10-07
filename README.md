@@ -13,7 +13,7 @@ You are those junior developers and testers.
 
 ## High-Level Architecture of AI Anti-Fraud 3.0
 
-![Architecture sequence diagram](/architecture-sequence-diagram.svg)
+![Architecture sequence diagram](/diagrams/sequence-diagram.png)
 
 ![Threat model](/ThreatDragonModels/threatmodel.png)
 
