@@ -24,7 +24,7 @@ CONTENT_SECURITY_POLICY = (
     "object-src 'none'; "
     "frame-ancestors 'none'; "
     "form-action 'self'; "
-    "script-src 'none'; "
+    "script-src 'self'; "
     "style-src 'self'; "
     "img-src 'self' data:; "
     "font-src 'self'; "
@@ -65,7 +65,7 @@ allowed_tokens = [
 ]
 
 FRONTEND_TOKEN = allowed_tokens[0]
-DEFAULT_FRONTEND_QUESTION = "Is transaction TX-1002 fraudulent?"
+DEFAULT_FRONTEND_QUESTION = "Is transaction 74c9a7e9-e30c-48f0-8d8f-ec8771849d46 fraudulent?"
 
 # System prompt for the grand idea: let the model draft SQL and hope it behaves.
 SYSTEM_PROMPT_SQL = """
@@ -182,6 +182,12 @@ def web_frontend():
 def web_frontend_styles():
     """Serve the stylesheet used by the static web mockup."""
     return send_from_directory(FRONTEND_DIRECTORY, "styles.css")
+
+
+@app.route("/app.js", methods=["GET"])
+def web_frontend_script():
+    """Serve the small same-origin script used for form submission state."""
+    return send_from_directory(FRONTEND_DIRECTORY, "app.js")
 
 
 @app.route("/report", methods=["POST"])

@@ -42,8 +42,8 @@
               "isTrustBoundary": true,
               "hasOpenThreats": false,
               "crossingFlows": [
-                "637d8d3f-e356-4b25-8d43-d0b1bc99fd15",
-                "2ee1ae44-3c51-4a8b-9296-fda77dc6c3d6"
+                "2ee1ae44-3c51-4a8b-9296-fda77dc6c3d6",
+                "637d8d3f-e356-4b25-8d43-d0b1bc99fd15"
               ],
               "containedElements": [
                 "1d4cb7b2-743c-4b3c-b4bc-9e6a683ad865",
@@ -53,11 +53,11 @@
           },
           {
             "position": {
-              "x": 440,
-              "y": 50.0000000000002
+              "x": 420,
+              "y": 50.000000000000085
             },
             "size": {
-              "width": 510,
+              "width": 700,
               "height": 390
             },
             "attrs": {
@@ -76,8 +76,8 @@
               "isTrustBoundary": true,
               "hasOpenThreats": false,
               "crossingFlows": [
-                "637d8d3f-e356-4b25-8d43-d0b1bc99fd15",
-                "2ee1ae44-3c51-4a8b-9296-fda77dc6c3d6"
+                "2ee1ae44-3c51-4a8b-9296-fda77dc6c3d6",
+                "637d8d3f-e356-4b25-8d43-d0b1bc99fd15"
               ],
               "containedElements": [
                 "8fb60b39-0e03-4f87-a30f-b21cf1da7da6",
@@ -87,13 +87,14 @@
                 "edae3c99-c40d-43bb-8c92-2342fbbafba8",
                 "65bd86c3-d068-4d93-9358-060d0aa9effa",
                 "90d5a152-94ac-49ca-b639-be35e74c5508",
-                "4cda4138-65ba-49be-92e5-7174f9b35af9"
+                "4cda4138-65ba-49be-92e5-7174f9b35af9",
+                "767a99ae-52c2-45c8-8708-8e673b01d4b6"
               ]
             }
           },
           {
             "position": {
-              "x": 470,
+              "x": 570,
               "y": 110
             },
             "size": {
@@ -447,7 +448,7 @@
           },
           {
             "position": {
-              "x": 470,
+              "x": 570,
               "y": 338
             },
             "size": {
@@ -568,7 +569,7 @@
           },
           {
             "position": {
-              "x": 810,
+              "x": 910,
               "y": 250
             },
             "size": {
@@ -692,7 +693,7 @@
           },
           {
             "position": {
-              "x": 810,
+              "x": 910,
               "y": 338
             },
             "size": {
@@ -816,7 +817,7 @@
           },
           {
             "position": {
-              "x": 810,
+              "x": 910,
               "y": 120
             },
             "size": {
@@ -940,7 +941,7 @@
           },
           {
             "position": {
-              "x": 590,
+              "x": 690,
               "y": 245
             },
             "size": {
@@ -1060,7 +1061,7 @@
           },
           {
             "position": {
-              "x": 590,
+              "x": 690,
               "y": 115
             },
             "size": {
@@ -1177,56 +1178,6 @@
               "privilegeLevel": "",
               "threats": []
             }
-          },
-          {
-            "shape": "flow",
-            "attrs": {
-              "line": {
-                "stroke": "#333333",
-                "targetMarker": {
-                  "name": "block"
-                },
-                "sourceMarker": {
-                  "name": ""
-                },
-                "strokeDasharray": null
-              }
-            },
-            "width": 200,
-            "height": 100,
-            "zIndex": 10,
-            "connector": "smooth",
-            "data": {
-              "type": "tm.Flow",
-              "name": "HTTP fraud question\n+ token",
-              "description": "",
-              "outOfScope": false,
-              "isTrustBoundary": false,
-              "reasonOutOfScope": "",
-              "hasOpenThreats": false,
-              "isBidirectional": false,
-              "isEncrypted": false,
-              "isPublicNetwork": false,
-              "protocol": "",
-              "threats": [],
-              "trustBoundaryIds": [
-                "4e7baaec-0ef7-4ba5-9d33-bc895422fb2d",
-                "a6beb976-8925-47fe-8c70-2ed9093b89c9"
-              ]
-            },
-            "labels": [
-              "HTTP fraud question\n+ token"
-            ],
-            "id": "637d8d3f-e356-4b25-8d43-d0b1bc99fd15",
-            "source": {
-              "cell": "1d4cb7b2-743c-4b3c-b4bc-9e6a683ad865",
-              "port": "a483404a-f647-4f08-adc8-928021279e75"
-            },
-            "target": {
-              "cell": "8fb60b39-0e03-4f87-a30f-b21cf1da7da6",
-              "port": "fee1ff86-7776-4a2d-95d1-e363c1572f35"
-            },
-            "vertices": []
           },
           {
             "shape": "flow",
@@ -1608,8 +1559,105 @@
             "vertices": []
           },
           {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "HTTP fraud question",
+              "description": "",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": [
+                "4e7baaec-0ef7-4ba5-9d33-bc895422fb2d",
+                "a6beb976-8925-47fe-8c70-2ed9093b89c9"
+              ]
+            },
+            "labels": [
+              "HTTP fraud question"
+            ],
+            "id": "637d8d3f-e356-4b25-8d43-d0b1bc99fd15",
+            "source": {
+              "cell": "1d4cb7b2-743c-4b3c-b4bc-9e6a683ad865",
+              "port": "a483404a-f647-4f08-adc8-928021279e75"
+            },
+            "target": {
+              "cell": "767a99ae-52c2-45c8-8708-8e673b01d4b6",
+              "port": "d6605eff-b500-4c7e-9dd4-d52b1994c4e3"
+            },
+            "vertices": []
+          },
+          {
+            "shape": "flow",
+            "attrs": {
+              "line": {
+                "stroke": "#333333",
+                "targetMarker": {
+                  "name": "block"
+                },
+                "sourceMarker": {
+                  "name": ""
+                },
+                "strokeDasharray": null
+              }
+            },
+            "width": 200,
+            "height": 100,
+            "zIndex": 10,
+            "connector": "smooth",
+            "data": {
+              "type": "tm.Flow",
+              "name": "",
+              "description": "",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "isBidirectional": false,
+              "isEncrypted": false,
+              "isPublicNetwork": false,
+              "protocol": "",
+              "threats": [],
+              "trustBoundaryIds": []
+            },
+            "labels": [
+              ""
+            ],
+            "id": "c5c35d7f-5284-4fab-9a0f-95e5c6b97cb5",
+            "source": {
+              "cell": "767a99ae-52c2-45c8-8708-8e673b01d4b6",
+              "port": "deb1dd3a-f7a4-4e6d-9b3d-b969a35d61e5"
+            },
+            "target": {
+              "cell": "8fb60b39-0e03-4f87-a30f-b21cf1da7da6",
+              "port": "fee1ff86-7776-4a2d-95d1-e363c1572f35"
+            },
+            "vertices": []
+          },
+          {
             "position": {
-              "x": 638.75,
+              "x": 738.75,
               "y": 80
             },
             "size": {
@@ -1623,12 +1671,132 @@
             },
             "visible": true,
             "shape": "td-text-block",
-            "id": "4cda4138-65ba-49be-92e5-7174f9b35af9",
             "zIndex": 11,
+            "id": "4cda4138-65ba-49be-92e5-7174f9b35af9",
             "data": {
               "type": "tm.Text",
               "name": "instances x 3",
               "hasOpenThreats": false
+            }
+          },
+          {
+            "position": {
+              "x": 452,
+              "y": 110
+            },
+            "size": {
+              "width": 90,
+              "height": 80
+            },
+            "attrs": {
+              "text": {
+                "text": "Anti-Fraud\nFrontend"
+              },
+              "body": {
+                "stroke": "#333333",
+                "strokeWidth": 1.5,
+                "strokeDasharray": null
+              }
+            },
+            "visible": true,
+            "shape": "process",
+            "ports": {
+              "groups": {
+                "top": {
+                  "position": "top",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "right": {
+                  "position": "right",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "bottom": {
+                  "position": "bottom",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                },
+                "left": {
+                  "position": "left",
+                  "attrs": {
+                    "circle": {
+                      "r": 4,
+                      "magnet": true,
+                      "stroke": "#5F95FF",
+                      "strokeWidth": 1,
+                      "fill": "#fff",
+                      "style": {
+                        "visibility": "hidden"
+                      }
+                    }
+                  }
+                }
+              },
+              "items": [
+                {
+                  "group": "top",
+                  "id": "7b607d01-dc22-4bb3-84f1-5cdcae5636de"
+                },
+                {
+                  "group": "right",
+                  "id": "deb1dd3a-f7a4-4e6d-9b3d-b969a35d61e5"
+                },
+                {
+                  "group": "bottom",
+                  "id": "5e115f40-3934-436d-862d-981dbe252637"
+                },
+                {
+                  "group": "left",
+                  "id": "d6605eff-b500-4c7e-9dd4-d52b1994c4e3"
+                }
+              ]
+            },
+            "id": "767a99ae-52c2-45c8-8708-8e673b01d4b6",
+            "zIndex": 12,
+            "data": {
+              "type": "tm.Process",
+              "name": "Anti-Fraud\nFrontend",
+              "description": "",
+              "outOfScope": false,
+              "isTrustBoundary": false,
+              "reasonOutOfScope": "",
+              "hasOpenThreats": false,
+              "handlesCardPayment": false,
+              "handlesGoodsOrServices": false,
+              "isWebApplication": false,
+              "privilegeLevel": "",
+              "threats": []
             }
           }
         ]

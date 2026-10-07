@@ -7,6 +7,7 @@
     <meta name="description" content="A-Corp AI Anti Fraud 3.0 transaction review workspace">
     <title>AI Anti Fraud 3.0 | A-Corp</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
 </head>
 <body>
     <div class="page-shell">
@@ -144,7 +145,7 @@
                     </div>
 
                     <div class="review-actions">
-                        <div class="approval-status{% if result and not result.ok %} approval-status-error{% endif %}" id="approval-status">
+                        <div class="approval-status{% if result and not result.ok %} approval-status-error{% endif %}" id="approval-status" aria-live="polite">
                             <span class="approval-icon" aria-hidden="true">{% if result and not result.ok %}&#10007;{% else %}&#10003;{% endif %}</span>
                             <span>
                                 <strong>{% if result and result.ok %}Review status: ready for review.{% elif result %}Review status: unavailable.{% else %}Review status: waiting for an investigation.{% endif %}</strong>
@@ -158,7 +159,7 @@
                             <input type="hidden" name="answer" value="{{ result.answer }}">
                             <button class="button button-secondary" type="submit">Download review report</button>
                         </form>
-                        <p class="static-caption">No JavaScript is used; the report downloads from the server.</p>
+                        <p class="static-caption">The report downloads from the server.</p>
                         {% endif %}
                     </div>
 

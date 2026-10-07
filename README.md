@@ -21,6 +21,16 @@ Threat model template: [OWASP Threat Dragon EoP Games DFD](ThreatDragonModels/th
 
 The AI Anti-Fraud 3.0 is deployed as a small microservice system. It separates request handling, model inference, and supporting services so the application can be scaled and threat-modeled more easily.
 
+## Screenshots Frontend
+
+Awaiting investigation:
+
+![Ready for requests](/images/screenshot1.png)
+
+Investigation complete:
+
+![Waiting for an answer](/images/screenshot2.png)
+
 ### AI Anti-Fraud 3.0 Components
 
 - `Api Proxy`
@@ -149,15 +159,18 @@ The responsive, server-rendered HTML/CSS frontend lives in `frontend/`:
 
 - `frontend/index.html` - A-Corp transaction review screen
 - `frontend/styles.css` - desktop, tablet, and mobile layout styles
+- `frontend/app.js` - same-origin submit-state feedback for new investigations
 
 The Flask app serves it over plain HTTP at `http://localhost:9000/`. Submitting a
 question or selecting a sample query runs the same investigation workflow as the
 JSON API. Successful reviews can be downloaded as a plain-text report from the
-page. No JavaScript, TLS, HTTPS redirect, or HSTS policy is used.
+page. A small same-origin script changes the review status to
+`Review status: waiting for an investigation.` while a new submission is being
+processed. No TLS, HTTPS redirect, or HSTS policy is used.
 
 The status card checks the model service's `/health` endpoint. It shows a green
 check and light when the service responds, and a red cross and light when it is
-unavailable. Responses include a strict no-script Content Security Policy and
+unavailable. Responses include a strict same-origin Content Security Policy and
 additional browser security headers without changing the HTTP transport.
 
 ## Tests

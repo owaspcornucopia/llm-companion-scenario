@@ -25,15 +25,23 @@ class AppTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("AI Anti Fraud 3.0", html)
         self.assertIn('href="styles.css"', html)
+        self.assertIn('<script src="app.js" defer></script>', html)
         self.assertIn("API inference ready", html)
         self.assertNotIn("status-icon-error", html)
-        self.assertNotIn("<script", html.lower())
         self.assertEqual(response.headers["Cache-Control"], "no-store")
-        self.assertIn("script-src 'none'", response.headers["Content-Security-Policy"])
+        self.assertIn("script-src 'self'", response.headers["Content-Security-Policy"])
         self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
         self.assertEqual(response.headers["X-Frame-Options"], "DENY")
         self.assertIsNone(response.headers.get("Strict-Transport-Security"))
         get_mock.assert_called_once_with(f"{fraud_app.MODEL_SERVICE_URL}/health", timeout=2)
+
+    def test_frontend_script_is_served_over_http(self):
+        response = self.client.get("/app.js", base_url="http://localhost")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "text/javascript")
+        self.assertIn("Review status: waiting for an investigation.", response.get_data(as_text=True))
+        response.close()
 
     @patch.object(fraud_app.http_requests, "get")
     def test_web_frontend_shows_red_unavailable_status(self, get_mock):

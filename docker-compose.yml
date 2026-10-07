@@ -23,6 +23,12 @@ services:
       - ./pwnednext:/models/pwnednext
       - ./model_service.py:/application/model_service.py
     cpus: "8"
+    # If you have an NVIDIA GPU, first install/update the Windows NVIDIA driver with WSL2 support and confirm:
+    # nvidia-smi
+    # wsl -d Ubuntu nvidia-smi
+    #
+    # Uncomment the following line to enable GPU support in Docker.
+    # gpus: all
     mem_limit: 12g
     # Uncomment for GPU access when the CPU-only victory lap stops being fun.
     # Setup guide: https://docs.nvidia.com/cuda/wsl-user-guide/
