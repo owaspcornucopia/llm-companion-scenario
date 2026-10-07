@@ -1,8 +1,8 @@
 import json
 import ast
 
-from flask import Flask, abort, request
-from flask import jsonify
+from flask import Flask, abort, make_response, render_template, request
+from flask import jsonify, send_from_directory
 import os 
 import sqlite3
 import logging
@@ -14,9 +14,40 @@ import requests as http_requests
 log = logging.getLogger('werkzeug') # Too many errors, so naturally we made them someone else's problem.
 log.disabled = True
 
-app = Flask(__name__)
-
 MODEL_SERVICE_URL = os.environ.get("MODEL_SERVICE_URL", "http://localhost:9001")
+FRONTEND_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend")
+app = Flask(__name__, template_folder=FRONTEND_DIRECTORY)
+
+CONTENT_SECURITY_POLICY = (
+    "default-src 'self'; "
+    "base-uri 'none'; "
+    "object-src 'none'; "
+    "frame-ancestors 'none'; "
+    "form-action 'self'; "
+    "script-src 'none'; "
+    "style-src 'self'; "
+    "img-src 'self' data:; "
+    "font-src 'self'; "
+    "connect-src 'self'; "
+    "media-src 'none'; "
+    "worker-src 'none'"
+)
+
+
+@app.after_request
+def add_security_headers(response):
+    """Apply defense-in-depth headers to every frontend and API response."""
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["Content-Security-Policy"] = CONTENT_SECURITY_POLICY
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = (
+        "camera=(), geolocation=(), microphone=(), payment=(), usb=()"
+    )
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+    response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+    return response
 
 # Tiny helper so crashes still make it to container logs after all the swagger.
 def print_stacktrace_to_stdout(context: str):
@@ -32,6 +63,9 @@ allowed_tokens = [
 "8bd71e52-01ba-4e35-97f4-f7079872a219", # NFT trader 5000
 "5779e738-c3fc-418c-ac9e-ae1aaa90414e", # Jon's backdoor token
 ]
+
+FRONTEND_TOKEN = allowed_tokens[0]
+DEFAULT_FRONTEND_QUESTION = "Is transaction TX-1002 fraudulent?"
 
 # System prompt for the grand idea: let the model draft SQL and hope it behaves.
 SYSTEM_PROMPT_SQL = """
@@ -60,8 +94,9 @@ based on the investigation results. If you are unsure, say you are unsure but ex
 """.strip()
 
 # Local SQL tool: direct query execution with confidence levels set to "heroic."
-def investigation_fraud(query):
-    if not request.headers.get('token') in allowed_tokens:
+def investigation_fraud(query, token=None):
+    request_token = request.headers.get('token') if token is None else token
+    if request_token not in allowed_tokens:
         abort(401, description="You need a token")
     # Open the shared SQLite file, or create it on demand like that was always the plan.
     conn = sqlite3.connect(os.environ.get("DB_CONNECTION_STRING","db.sqlite")) 
@@ -75,10 +110,107 @@ def investigation_fraud(query):
     finally:
         conn.close()
 
+def model_service_available():
+    """Return whether the model service responds to its health endpoint."""
+    try:
+        response = http_requests.get(f"{MODEL_SERVICE_URL}/health", timeout=2)
+    except Exception:
+        return False
+    return response.status_code == 200
+
+
+def frontend_result(question, payload, status_code):
+    """Normalize an API payload for the server-rendered review card."""
+    entry = payload[0] if payload else {}
+    if status_code != 200 or "error" in entry:
+        message = entry.get("error") or entry.get("apertus") or "The investigation could not be completed."
+        return {
+            "ok": False,
+            "question": question,
+            "verdict": "Review unavailable",
+            "answer": str(message),
+            "notes": "Check the API and model-service status before trying again.",
+        }
+
+    answer = str(entry.get("apertus", "")).strip() or "The API returned no investigation summary."
+    return {
+        "ok": True,
+        "question": question,
+        "verdict": "Investigation complete",
+        "answer": answer,
+        "notes": "This summary was returned by the investigation API and should be confirmed by a human reviewer.",
+    }
+
+
+@app.route("/", methods=["GET", "POST"])
+def web_frontend():
+    """Render the HTML frontend and handle its server-side investigation form."""
+    backend_reachable = model_service_available()
+    source = request.form if request.method == "POST" else request.args
+    question = str(source.get("question", DEFAULT_FRONTEND_QUESTION)).strip()
+    should_investigate = request.method == "POST" or "question" in request.args
+    result = None
+
+    if should_investigate:
+        if not question:
+            result = frontend_result(
+                question,
+                [{"apertus": "Provide a question before starting an investigation.", "error": "Question is required."}],
+                400,
+            )
+        elif not backend_reachable:
+            result = {
+                "ok": False,
+                "question": question,
+                "verdict": "Review unavailable",
+                "answer": "The API inference backend is not reachable.",
+                "notes": "Start the model service and try this investigation again.",
+            }
+        else:
+            payload, status_code = investigate_question(question, FRONTEND_TOKEN)
+            result = frontend_result(question, payload, status_code)
+
+    return render_template(
+        "index.html",
+        backend_reachable=backend_reachable,
+        question=question,
+        result=result,
+    )
+
+
+@app.route("/styles.css", methods=["GET"])
+def web_frontend_styles():
+    """Serve the stylesheet used by the static web mockup."""
+    return send_from_directory(FRONTEND_DIRECTORY, "styles.css")
+
+
+@app.route("/report", methods=["POST"])
+def frontend_report():
+    """Download a plain-text report from the latest server-rendered result."""
+    question = request.form.get("question", "").strip()
+    verdict = request.form.get("verdict", "Investigation result").strip()
+    answer = request.form.get("answer", "").strip()
+    if not answer:
+        abort(400, description="A completed investigation is required before downloading a report.")
+
+    report = (
+        "AI Anti Fraud 3.0 review\n"
+        "========================\n\n"
+        f"Question: {question}\n"
+        f"Verdict: {verdict}\n\n"
+        f"Investigation summary:\n{answer}\n"
+    )
+    response = make_response(report)
+    response.headers["Content-Type"] = "text/plain; charset=utf-8"
+    response.headers["Content-Disposition"] = (
+        'attachment; filename="ai-anti-fraud-review.txt"'
+    )
+    return response
+
+
 # Main API endpoint: accept a question, orchestrate the model, and touch the database.
 @app.route('/api/fraud', methods=['GET', 'POST']) 
 def investigate_transaction():
-
     # Read the question from JSON or query string; elegance was delegated to future us.
     if request.method == 'POST':
         body = request.get_json(silent=True) or {}
@@ -86,6 +218,13 @@ def investigate_transaction():
     else:
         question = str(request.args.get("question", "")).strip()
 
+    data, status_code = investigate_question(question)
+    return jsonify({"response": data}), status_code
+
+
+def investigate_question(question, token=None):
+    """Run the shared model-to-SQL-to-summary workflow for API and HTML clients."""
+    question = str(question).strip()
     data = []
     # Refuse empty questions, because even this code has limits.
     if not question:
@@ -109,7 +248,7 @@ def investigate_transaction():
             "I could not generate an investigation tool call.",
             str(e)
         ])))
-        return jsonify({"response": data}), 500
+        return data, 500
 
     # Parse the model output into the expected tool schema, if the model felt cooperative.
     tool_call = parse_tool_call(llm_tool_response)
@@ -128,12 +267,15 @@ def investigate_transaction():
             "Tool output format did not match expected schema.",
             llm_tool_response
         ])))
-        return jsonify({"response": data})
+        return data, 200
 
     sql_query = tool_call["args"]["query"]
     try:
         # Run whatever SQL survived parsing and collect the rows.
-        results = investigation_fraud(sql_query)
+        if token is None:
+            results = investigation_fraud(sql_query)
+        else:
+            results = investigation_fraud(sql_query, token)
     except Exception as e:
         app.logger.exception("Investigation tool execution failed")
         print_stacktrace_to_stdout("investigation_tool_execution_failed")
@@ -146,7 +288,7 @@ def investigate_transaction():
             str(e),
             sql_query
         ])))
-        return jsonify({"response": data}), 500
+        return data, 500
 
     # Repackage SQL results as text so the model can narrate them with conviction.
     results_text = json.dumps(results, ensure_ascii=True)
@@ -172,11 +314,11 @@ def investigate_transaction():
             "Final answer generation failed.",
             str(e)
         ])))
-        return jsonify({"response": data}), 500
+        return data, 500
     
     # Ship the final answer back as JSON and call it orchestration.
     data.append(dict(zip(["apertus"], [final_answer])))
-    return jsonify({"response": data})
+    return data, 200
 
 # Thin wrapper around the model service, because indirectness sounds enterprise.
 def generate_once(messages):

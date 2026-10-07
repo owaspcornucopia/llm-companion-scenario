@@ -248,6 +248,7 @@ class ModelServiceTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), {"result": "ok"})
+        self.assertEqual(response.headers["Cache-Control"], "no-store")
         generate_mock.assert_called_once()
 
     def test_generate_endpoint_returns_error_payload_on_exception(self):

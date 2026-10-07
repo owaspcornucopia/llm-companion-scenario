@@ -9,6 +9,14 @@ from flask import Flask, abort, request, jsonify
 
 app = Flask(__name__)
 
+
+@app.after_request
+def add_no_store_header(response):
+    """Prevent model outputs and health responses from being cached."""
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 # Minimal crash reporter so failures still make the logs, despite the theatrical confidence.
 def print_stacktrace_to_stdout(context: str):
     print(f"[{context}]", file=sys.stdout, flush=True)

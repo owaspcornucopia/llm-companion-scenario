@@ -15,6 +15,104 @@ class AppTests(unittest.TestCase):
     def setUp(self):
         self.client = fraud_app.app.test_client()
 
+    @patch.object(fraud_app.http_requests, "get")
+    def test_web_frontend_serves_over_http_with_ready_status_and_security_headers(self, get_mock):
+        get_mock.return_value = Mock(status_code=200)
+
+        response = self.client.get("/", base_url="http://localhost")
+        html = response.get_data(as_text=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("AI Anti Fraud 3.0", html)
+        self.assertIn('href="styles.css"', html)
+        self.assertIn("API inference ready", html)
+        self.assertNotIn("status-icon-error", html)
+        self.assertNotIn("<script", html.lower())
+        self.assertEqual(response.headers["Cache-Control"], "no-store")
+        self.assertIn("script-src 'none'", response.headers["Content-Security-Policy"])
+        self.assertEqual(response.headers["X-Content-Type-Options"], "nosniff")
+        self.assertEqual(response.headers["X-Frame-Options"], "DENY")
+        self.assertIsNone(response.headers.get("Strict-Transport-Security"))
+        get_mock.assert_called_once_with(f"{fraud_app.MODEL_SERVICE_URL}/health", timeout=2)
+
+    @patch.object(fraud_app.http_requests, "get")
+    def test_web_frontend_shows_red_unavailable_status(self, get_mock):
+        get_mock.side_effect = fraud_app.http_requests.ConnectionError("model service offline")
+
+        response = self.client.get("/", base_url="http://localhost")
+        html = response.get_data(as_text=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("API inference unavailable", html)
+        self.assertIn("status-icon-error", html)
+        self.assertIn("status-pulse-error", html)
+        self.assertIn("Backend unavailable", html)
+
+    @patch.object(fraud_app, "model_service_available", return_value=True)
+    @patch.object(fraud_app, "investigate_question", return_value=([{"apertus": "transaction answer"}], 200))
+    def test_web_frontend_post_runs_investigation_and_renders_report_action(
+        self, investigate_mock, health_mock
+    ):
+        response = self.client.post(
+            "/",
+            data={"question": "Check transaction TX-1002"},
+            base_url="http://localhost",
+        )
+        html = response.get_data(as_text=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("transaction answer", html)
+        self.assertIn("Check transaction TX-1002", html)
+        self.assertIn("Download review report", html)
+        investigate_mock.assert_called_once_with("Check transaction TX-1002", fraud_app.FRONTEND_TOKEN)
+        health_mock.assert_called_once_with()
+
+    @patch.object(fraud_app, "model_service_available", return_value=True)
+    @patch.object(fraud_app, "investigate_question", return_value=([{"apertus": "sample answer"}], 200))
+    def test_sample_query_runs_investigation_from_get_link(self, investigate_mock, health_mock):
+        response = self.client.get(
+            "/?question=Show%20all%20transactions",
+            base_url="http://localhost",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("sample answer", response.get_data(as_text=True))
+        investigate_mock.assert_called_once_with("Show all transactions", fraud_app.FRONTEND_TOKEN)
+        health_mock.assert_called_once_with()
+
+    @patch.object(fraud_app, "model_service_available", return_value=False)
+    @patch.object(fraud_app, "investigate_question")
+    def test_web_frontend_does_not_call_api_when_backend_is_unavailable(self, investigate_mock, health_mock):
+        response = self.client.post(
+            "/",
+            data={"question": "Check transaction TX-1002"},
+            base_url="http://localhost",
+        )
+        html = response.get_data(as_text=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("The API inference backend is not reachable.", html)
+        self.assertIn("status-icon-error", html)
+        investigate_mock.assert_not_called()
+        health_mock.assert_called_once_with()
+
+    def test_frontend_report_download_is_plain_text_over_http(self):
+        response = self.client.post(
+            "/report",
+            data={
+                "question": "Check transaction TX-1002",
+                "verdict": "Investigation complete",
+                "answer": "transaction answer",
+            },
+            base_url="http://localhost",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.mimetype, "text/plain")
+        self.assertIn("attachment; filename=\"ai-anti-fraud-review.txt\"", response.headers["Content-Disposition"])
+        self.assertIn("transaction answer", response.get_data(as_text=True))
+        self.assertIsNone(response.headers.get("Strict-Transport-Security"))
+
     def test_print_stacktrace_to_stdout_writes_context(self):
         fake_stdout = io.StringIO()
 

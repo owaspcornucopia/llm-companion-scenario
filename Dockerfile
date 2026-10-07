@@ -25,5 +25,6 @@ RUN pip install \
     Werkzeug==2.3.6
 
 COPY app.py model_service.py ./
+COPY frontend ./frontend
 
 EXPOSE 9000 9001
