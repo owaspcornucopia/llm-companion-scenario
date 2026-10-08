@@ -2,6 +2,8 @@ import importlib
 import io
 import runpy
 import sys
+import threading
+import time
 import types
 import types
 import unittest
@@ -176,6 +178,7 @@ class ModelServiceTests(unittest.TestCase):
             max_new_tokens=384,
             temperature=0.2,
             do_sample=True,
+            remove_invalid_values=True,
             eos_token_id=loaded["tokenizer"].eos_token_id,
             pad_token_id=loaded["tokenizer"].pad_token_id,
         )
@@ -210,6 +213,49 @@ class ModelServiceTests(unittest.TestCase):
             [10, 20, 30],
         )
         self.assertEqual(result, "decoded response")
+
+    def test_generate_once_serializes_concurrent_model_generation(self):
+        loaded = load_model_service_with_mocks()
+        module = loaded["module"]
+        start_barrier = threading.Barrier(2)
+        counter_lock = threading.Lock()
+        active_generations = 0
+        maximum_active_generations = 0
+
+        def generate(*_args, **_kwargs):
+            nonlocal active_generations, maximum_active_generations
+            with counter_lock:
+                active_generations += 1
+                maximum_active_generations = max(
+                    maximum_active_generations,
+                    active_generations,
+                )
+            try:
+                time.sleep(0.05)
+                return [FakeTensor([10, 20, 30, 40, 50])]
+            finally:
+                with counter_lock:
+                    active_generations -= 1
+
+        loaded["adapted_model"].generate.side_effect = generate
+        errors = []
+
+        def run_generation():
+            try:
+                start_barrier.wait(timeout=1)
+                module.generate_once([{"role": "user", "content": "concurrent"}])
+            except Exception as exception:
+                errors.append(exception)
+
+        threads = [threading.Thread(target=run_generation) for _ in range(2)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(timeout=2)
+
+        self.assertFalse(any(thread.is_alive() for thread in threads))
+        self.assertEqual(errors, [])
+        self.assertEqual(maximum_active_generations, 1)
 
     def test_generate_once_returns_fallback_sql_when_model_is_unavailable(self):
         loaded = load_model_service_with_mocks(model_load_error=RuntimeError("unavailable"))

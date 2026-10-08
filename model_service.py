@@ -1,5 +1,6 @@
 import json
 import sys
+import threading
 import traceback
 
 import torch
@@ -34,6 +35,7 @@ if tokenizer.pad_token_id is None:
 model = None
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model_load_error = None
+model_generation_lock = threading.Lock()
 
 try:
     # Load in 4-bit mode to squeeze a large model into hardware that deserved more honesty.
@@ -107,15 +109,19 @@ def generate_once(messages):
         input_ids = inputs.to(device)
         attention_mask = torch.ones_like(input_ids)
     # Run generation with a short token budget and light sampling.
-    outputs = model.generate(
-        input_ids,
-        attention_mask=attention_mask,
-        max_new_tokens=384,
-        temperature=0.2,
-        do_sample=True,
-        eos_token_id=tokenizer.eos_token_id,
-        pad_token_id=tokenizer.pad_token_id,
-    )
+    # CPU 4-bit bitsandbytes mutates QuantState during its first forward pass.
+    # Serialize requests so concurrent generations cannot race on that state.
+    with model_generation_lock:
+        outputs = model.generate(
+            input_ids,
+            attention_mask=attention_mask,
+            max_new_tokens=384,
+            temperature=0.2,
+            do_sample=True,
+            remove_invalid_values=True,
+            eos_token_id=tokenizer.eos_token_id,
+            pad_token_id=tokenizer.pad_token_id,
+        )
     # Decode the fresh tokens and trim the answer down to text.
     return tokenizer.decode(outputs[0][input_ids.shape[1]:], skip_special_tokens=True).strip()
 

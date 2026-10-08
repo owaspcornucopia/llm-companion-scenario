@@ -24,7 +24,7 @@ class AppTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("AI Anti Fraud 3.0", html)
-        self.assertIn('href="styles.css"', html)
+        self.assertIn('href="styles.css?v=2"', html)
         self.assertIn('<script src="app.js" defer></script>', html)
         self.assertIn("API inference ready", html)
         self.assertNotIn("status-icon-error", html)
@@ -63,16 +63,16 @@ class AppTests(unittest.TestCase):
     ):
         response = self.client.post(
             "/",
-            data={"question": "Check transaction TX-1002"},
+            data={"question": "Check transaction 74c9a7e9-e30c-48f0-8d8f-ec8771849d46"},
             base_url="http://localhost",
         )
         html = response.get_data(as_text=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("transaction answer", html)
-        self.assertIn("Check transaction TX-1002", html)
+        self.assertIn("Check transaction 74c9a7e9-e30c-48f0-8d8f-ec8771849d46", html)
         self.assertIn("Download review report", html)
-        investigate_mock.assert_called_once_with("Check transaction TX-1002", fraud_app.FRONTEND_TOKEN)
+        investigate_mock.assert_called_once_with("Check transaction 74c9a7e9-e30c-48f0-8d8f-ec8771849d46", fraud_app.FRONTEND_TOKEN)
         health_mock.assert_called_once_with()
 
     @patch.object(fraud_app, "model_service_available", return_value=True)
@@ -93,7 +93,7 @@ class AppTests(unittest.TestCase):
     def test_web_frontend_does_not_call_api_when_backend_is_unavailable(self, investigate_mock, health_mock):
         response = self.client.post(
             "/",
-            data={"question": "Check transaction TX-1002"},
+            data={"question": "Check transaction 74c9a7e9-e30c-48f0-8d8f-ec8771849d46"},
             base_url="http://localhost",
         )
         html = response.get_data(as_text=True)
@@ -108,7 +108,7 @@ class AppTests(unittest.TestCase):
         response = self.client.post(
             "/report",
             data={
-                "question": "Check transaction TX-1002",
+                "question": "Check transaction 74c9a7e9-e30c-48f0-8d8f-ec8771849d46",
                 "verdict": "Investigation complete",
                 "answer": "transaction answer",
             },
@@ -224,7 +224,7 @@ class AppTests(unittest.TestCase):
             db_path = os.path.join(temp_dir, "fraud.sqlite")
             conn = sqlite3.connect(db_path)
             conn.execute("CREATE TABLE investigations (transaction_id TEXT, fraud_detected TEXT)")
-            conn.execute("INSERT INTO investigations VALUES ('tx-1', 'true')")
+            conn.execute("INSERT INTO investigations VALUES ('74c9a7e9-e30c-48f0-8d8f-ec8771849d46', 'true')")
             conn.commit()
             conn.close()
 
@@ -235,13 +235,13 @@ class AppTests(unittest.TestCase):
                 ):
                     rows = fraud_app.investigation_fraud("SELECT * FROM investigations")
 
-        self.assertEqual(rows, [{"transaction_id": "tx-1", "fraud_detected": "true"}])
+        self.assertEqual(rows, [{"transaction_id": "74c9a7e9-e30c-48f0-8d8f-ec8771849d46", "fraud_detected": "true"}])
 
     def test_investigate_transaction_orchestrates_tool_and_final_answer(self):
         tool_call = (
             '{"tool":"investigation_fraud","args":{"query":"SELECT * FROM investigations WHERE fraud_detected=\'true\'"}}'
         )
-        investigation_rows = [{"transaction_id": "tx-123", "fraud_detected": "true"}]
+        investigation_rows = [{"transaction_id": "74c9a7e9-e30c-48f0-8d8f-ec8771849d46", "fraud_detected": "true"}]
 
         with patch.object(fraud_app, "generate_once", side_effect=[tool_call, "likely fraudulent"]) as generate_mock, patch.object(
             fraud_app,
@@ -268,7 +268,7 @@ class AppTests(unittest.TestCase):
         self.assertEqual(first_messages[1], {"role": "user", "content": "Is this fraudulent?"})
         self.assertEqual(len(second_messages), 3)
         self.assertIn("Tool execution result:", second_messages[2]["content"])
-        self.assertIn("tx-123", second_messages[2]["content"])
+        self.assertIn("74c9a7e9-e30c-48f0-8d8f-ec8771849d46", second_messages[2]["content"])
 
     def test_investigate_transaction_requires_question(self):
         response = self.client.get("/api/fraud")

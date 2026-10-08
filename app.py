@@ -65,7 +65,7 @@ allowed_tokens = [
 ]
 
 FRONTEND_TOKEN = allowed_tokens[0]
-DEFAULT_FRONTEND_QUESTION = "Is transaction 74c9a7e9-e30c-48f0-8d8f-ec8771849d46 fraudulent?"
+DEFAULT_FRONTEND_QUESTION = "Is this transaction fraudulent?"
 
 # System prompt for the grand idea: let the model draft SQL and hope it behaves.
 SYSTEM_PROMPT_SQL = """
